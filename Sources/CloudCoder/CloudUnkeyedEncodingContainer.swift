@@ -8,7 +8,7 @@
 import Foundation
 import CloudKit
 
-struct CloudUnkeyedContainer: UnkeyedEncodingContainer, SingleValueEncodingContainer {
+struct CloudUnkeyedEncodingContainer: UnkeyedEncodingContainer, SingleValueEncodingContainer {
     
     var codingPath: [CodingKey]
     
@@ -103,21 +103,21 @@ struct CloudUnkeyedContainer: UnkeyedEncodingContainer, SingleValueEncodingConta
     }
     
     mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        return KeyedEncodingContainer(CloudKeyedContainer<NestedKey>(
+        defer { count += 1}
+        return KeyedEncodingContainer(CloudKeyedEncodingContainer<NestedKey>(
             path: self.codingPath,
             record: self.record,
             keyBase: "\(keyBase)\(count)__"
         ))
-        count += 1
     }
     
     mutating func nestedUnkeyedContainer() -> UnkeyedEncodingContainer {
-        return CloudUnkeyedContainer(
+        defer { count += 1}
+        return CloudUnkeyedEncodingContainer(
             path: self.codingPath,
             record: self.record,
             keyBase: "\(keyBase)\(count)__"
         )
-        count += 1
     }
     
     mutating func superEncoder() -> Encoder {

@@ -8,7 +8,7 @@
 import Foundation
 import CloudKit
 
-struct CloudKeyedContainer<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
+struct CloudKeyedEncodingContainer<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
     
     public var codingPath: [CodingKey]
     
@@ -86,7 +86,7 @@ struct CloudKeyedContainer<Key>: KeyedEncodingContainerProtocol where Key: Codin
     }
     
     public mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        return KeyedEncodingContainer(CloudKeyedContainer<NestedKey>(
+        return KeyedEncodingContainer(CloudKeyedEncodingContainer<NestedKey>(
             path: self.codingPath + [key],
             record: self.record,
             keyBase: "\(keyBase)\(key.stringValue)__"
@@ -94,7 +94,7 @@ struct CloudKeyedContainer<Key>: KeyedEncodingContainerProtocol where Key: Codin
     }
     
     public mutating func nestedUnkeyedContainer(forKey key: Key) -> UnkeyedEncodingContainer {
-        return CloudUnkeyedContainer(
+        return CloudUnkeyedEncodingContainer(
             path: self.codingPath + [key],
             record: self.record,
             keyBase: "\(keyBase)\(key.stringValue)__"

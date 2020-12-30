@@ -15,15 +15,15 @@ public final class CloudRecordEncoder: Encoder {
     public let zoneID: CKRecordZone.ID
     
     public func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
-        return KeyedEncodingContainer(CloudKeyedContainer<Key>(path: codingPath, record: record!, keyBase: self.keyBase))
+        return KeyedEncodingContainer(CloudKeyedEncodingContainer<Key>(path: codingPath, record: record!, keyBase: self.keyBase))
     }
     
     public func unkeyedContainer() -> UnkeyedEncodingContainer {
-        return CloudUnkeyedContainer(path: codingPath, record: record!, keyBase: self.keyBase)
+        return CloudUnkeyedEncodingContainer(path: codingPath, record: record!, keyBase: self.keyBase)
     }
     
     public func singleValueContainer() -> SingleValueEncodingContainer {
-        return CloudUnkeyedContainer(path: codingPath, record: record!, keyBase: self.keyBase)
+        return CloudUnkeyedEncodingContainer(path: codingPath, record: record!, keyBase: self.keyBase)
     }
     
     public func encode<Value>(_ value: Value) throws -> CKRecord where Value : Encodable, Value : Identifiable, Value.ID : CustomStringConvertible {
