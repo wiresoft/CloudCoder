@@ -80,7 +80,7 @@ struct CloudKeyedEncodingContainer<Key>: KeyedEncodingContainerProtocol where Ke
         let encoder = CloudRecordEncoder(
             path: self.codingPath + [key],
             record: self.record,
-            keyBase: "\(keyBase)\(key.stringValue)__"
+            keyBase: "\(keyBase)\(key.stringValue)"
         )
         try value.encode(to: encoder)
     }
@@ -89,7 +89,7 @@ struct CloudKeyedEncodingContainer<Key>: KeyedEncodingContainerProtocol where Ke
         return KeyedEncodingContainer(CloudKeyedEncodingContainer<NestedKey>(
             path: self.codingPath + [key],
             record: self.record,
-            keyBase: "\(keyBase)\(key.stringValue)__"
+            keyBase: "\(keyBase)\(key.stringValue)"
         ))
     }
     
@@ -97,7 +97,7 @@ struct CloudKeyedEncodingContainer<Key>: KeyedEncodingContainerProtocol where Ke
         return CloudUnkeyedEncodingContainer(
             path: self.codingPath + [key],
             record: self.record,
-            keyBase: "\(keyBase)\(key.stringValue)__"
+            keyBase: "\(keyBase)\(key.stringValue)"
         )
     }
     
@@ -105,7 +105,7 @@ struct CloudKeyedEncodingContainer<Key>: KeyedEncodingContainerProtocol where Ke
         return CloudRecordEncoder(
             path: self.codingPath,
             record: self.record,
-            keyBase: "\(keyBase)super__"
+            keyBase: "\(keyBase)super"
         )
     }
     
@@ -113,13 +113,13 @@ struct CloudKeyedEncodingContainer<Key>: KeyedEncodingContainerProtocol where Ke
         return CloudRecordEncoder(
             path: self.codingPath + [key],
             record: self.record,
-            keyBase: "\(keyBase)\(key.stringValue)__"
+            keyBase: "\(keyBase)\(key.stringValue)"
         )
     }
     
     init(path: [CodingKey], record: CKRecord, keyBase: String) {
         self.codingPath = path
         self.record = record
-        self.keyBase = keyBase
+        self.keyBase = keyBase.isEmpty ? keyBase : keyBase + "_"
     }
 }

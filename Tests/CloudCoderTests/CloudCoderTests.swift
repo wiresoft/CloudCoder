@@ -9,6 +9,8 @@ final class CloudCoderTests: XCTestCase {
         var boolean = false
         var double = 5.5
         var name = "something"
+        var array = [1,2,3,4]
+        var intDict = [1: "one", 2: "two"]
         var subValue = SubValue()
     }
     
@@ -17,6 +19,8 @@ final class CloudCoderTests: XCTestCase {
         var boolean = true
         var double = 11.5
         var name = "else"
+        var array = ["one", "two", "three"]
+        var dict = ["one": 1, "two": 2]
     }
     
     
@@ -32,9 +36,32 @@ final class CloudCoderTests: XCTestCase {
         XCTAssert(record["boolean"] == value.boolean)
         XCTAssert(record["double"] == value.double)
         XCTAssert(record["name"] == value.name)
-        XCTAssert(record["subValue__number"] == value.subValue.number)
-        XCTAssert(record["subValue__boolean"] == value.subValue.boolean)
-        XCTAssert(record["subValue__double"] == value.subValue.double)
-        XCTAssert(record["subValue__name"] == value.subValue.name)
+        XCTAssert(record["subValue_number"] == value.subValue.number)
+        XCTAssert(record["subValue_boolean"] == value.subValue.boolean)
+        XCTAssert(record["subValue_double"] == value.subValue.double)
+        XCTAssert(record["subValue_name"] == value.subValue.name)
+    }
+    
+    func testRoundTrip() throws {
+        
+        let encoder = CloudRecordEncoder(type: "TestValue")
+        let decoder = CloudRecordDecoder()
+        let value = TestValue()
+        let record = try encoder.encode(value)
+        
+        let output = try decoder.decode(TestValue.self, from: record)
+        XCTAssert(output.id == value.id)
+        XCTAssert(output.number == value.number)
+        XCTAssert(output.boolean == value.boolean)
+        XCTAssert(output.double == value.double)
+        XCTAssert(output.name == value.name)
+        XCTAssert(output.array == value.array)
+        XCTAssert(output.intDict == value.intDict)
+        XCTAssert(output.subValue.number == value.subValue.number)
+        XCTAssert(output.subValue.boolean == value.subValue.boolean)
+        XCTAssert(output.subValue.double == value.subValue.double)
+        XCTAssert(output.subValue.name == value.subValue.name)
+        XCTAssert(output.subValue.array == value.subValue.array)
+        XCTAssert(output.subValue.dict == value.subValue.dict)
     }
 }

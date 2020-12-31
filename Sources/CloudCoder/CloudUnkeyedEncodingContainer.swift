@@ -8,7 +8,7 @@
 import Foundation
 import CloudKit
 
-struct CloudUnkeyedEncodingContainer: UnkeyedEncodingContainer, SingleValueEncodingContainer {
+struct CloudUnkeyedEncodingContainer: UnkeyedEncodingContainer {
     
     var codingPath: [CodingKey]
     
@@ -97,26 +97,27 @@ struct CloudUnkeyedEncodingContainer: UnkeyedEncodingContainer, SingleValueEncod
         let encoder = CloudRecordEncoder(
             path: self.codingPath,
             record: self.record,
-            keyBase: "\(keyBase)\(count)__")
+            keyBase: "\(keyBase)\(count)"
+        )
         try value.encode(to: encoder)
         count += 1
     }
     
     mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        defer { count += 1}
+        defer { count += 1 }
         return KeyedEncodingContainer(CloudKeyedEncodingContainer<NestedKey>(
             path: self.codingPath,
             record: self.record,
-            keyBase: "\(keyBase)\(count)__"
+            keyBase: "\(keyBase)\(count)"
         ))
     }
     
     mutating func nestedUnkeyedContainer() -> UnkeyedEncodingContainer {
-        defer { count += 1}
+        defer { count += 1 }
         return CloudUnkeyedEncodingContainer(
             path: self.codingPath,
             record: self.record,
-            keyBase: "\(keyBase)\(count)__"
+            keyBase: "\(keyBase)\(count)"
         )
     }
     
@@ -124,18 +125,14 @@ struct CloudUnkeyedEncodingContainer: UnkeyedEncodingContainer, SingleValueEncod
         return CloudRecordEncoder(
             path: self.codingPath,
             record: self.record,
-            keyBase: "\(keyBase)super__"
+            keyBase: "\(keyBase)super"
         )
     }
     
     init(path: [CodingKey], record: CKRecord, keyBase: String) {
         self.codingPath = path
         self.record = record
-        self.keyBase = keyBase
+        self.keyBase = keyBase.isEmpty ? keyBase : keyBase + "_"
         self.count = 0
-    }
-    
-    private enum LocalKey: String, CodingKey {
-        case superKey
     }
 }
