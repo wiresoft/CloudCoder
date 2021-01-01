@@ -13,7 +13,7 @@ struct CloudUnkeyedDecodingContainer: UnkeyedDecodingContainer {
     var codingPath: [CodingKey]
     
     var count: Int? {
-        return storage?.count ?? 0
+        return nil
     }
     
     var isAtEnd: Bool {
