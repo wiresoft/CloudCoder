@@ -31,9 +31,13 @@ final class CloudCoderTests: XCTestCase {
         let value = TestValue()
         let record = try encoder.encode(value)
         
+        // make sure record type and ID are inferred correctly
         XCTAssert(record.recordType == "TestValue")
         XCTAssert(record.recordID.recordName == value.id.uuidString)
         XCTAssert(record.recordID.zoneID == CKRecordZone.ID.default)
+        
+        // make sure the keys are what we expect
+        XCTAssert(record["id"] == value.id)
         XCTAssert(record["number"] == value.number)
         XCTAssert(record["boolean"] == value.boolean)
         XCTAssert(record["double"] == value.double)
