@@ -17,8 +17,6 @@ public final class CloudRecordEncoder: Encoder {
         return [:]
     }
     
-    public let recordType: CKRecord.RecordType
-    
     public let zoneID: CKRecordZone.ID
     
     public func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
@@ -37,17 +35,17 @@ public final class CloudRecordEncoder: Encoder {
         )
     }
     
-    public func encode<Value>(_ value: Value) throws -> CKRecord where Value : Encodable, Value : Identifiable, Value.ID : CustomStringConvertible {
+    public func encode<Value>(_ value: Value, as type: CKRecord.RecordType? = nil) throws -> CKRecord where Value : Encodable, Value : Identifiable, Value.ID : CustomStringConvertible {
         let id = CKRecord.ID(recordName: String(describing: value.id), zoneID: zoneID)
-        let record = CKRecord(recordType: recordType, recordID: id)
+        let record = CKRecord(recordType: type ?? String(describing: Value.self), recordID: id)
         self.record = record
         try value.encode(to: self)
+        
         return record
     }
     
-    public init(type: CKRecord.RecordType, in zoneID: CKRecordZone.ID = CKRecordZone.ID.default) {
+    public init(zoneID: CKRecordZone.ID = CKRecordZone.ID.default) {
         self.codingPath = []
-        self.recordType = type
         self.record = nil
         self.zoneID = zoneID
         self.keyBase = ""
@@ -66,7 +64,6 @@ public final class CloudRecordEncoder: Encoder {
     internal init(path: [CodingKey], record: CKRecord, keyBase: String) {
         self.codingPath = path
         self.record = record
-        self.recordType = record.recordType
         self.keyBase = keyBase
         self.zoneID = record.recordID.zoneID
     }

@@ -11,6 +11,7 @@ final class CloudCoderTests: XCTestCase {
         var name = "something"
         var array = [1,2,3,4]
         var intDict = [1: "one", 2: "two"]
+        var stringSet: Set<String> = ["alpha", "beta", "delta"]
         var subValue = SubValue()
     }
     
@@ -24,27 +25,32 @@ final class CloudCoderTests: XCTestCase {
     }
     
     
-    func testEncoding() throws {
+    func testBasicEncoding() throws {
         
-        let encoder = CloudRecordEncoder(type: "TestValue")
+        let encoder = CloudRecordEncoder()
         let value = TestValue()
         let record = try encoder.encode(value)
         
+        XCTAssert(record.recordType == "TestValue")
         XCTAssert(record.recordID.recordName == value.id.uuidString)
         XCTAssert(record.recordID.zoneID == CKRecordZone.ID.default)
         XCTAssert(record["number"] == value.number)
         XCTAssert(record["boolean"] == value.boolean)
         XCTAssert(record["double"] == value.double)
         XCTAssert(record["name"] == value.name)
+        XCTAssert(record["array"] == value.array)
+        XCTAssert(record["intDict_1"] == value.intDict[1])
+        XCTAssert(record["intDict_2"] == value.intDict[2])
+        XCTAssert(record["stringSet"] != nil)
         XCTAssert(record["subValue_number"] == value.subValue.number)
         XCTAssert(record["subValue_boolean"] == value.subValue.boolean)
         XCTAssert(record["subValue_double"] == value.subValue.double)
         XCTAssert(record["subValue_name"] == value.subValue.name)
     }
     
-    func testRoundTrip() throws {
+    func testBasicRoundTrip() throws {
         
-        let encoder = CloudRecordEncoder(type: "TestValue")
+        let encoder = CloudRecordEncoder()
         let decoder = CloudRecordDecoder()
         let value = TestValue()
         let record = try encoder.encode(value)
@@ -57,6 +63,37 @@ final class CloudCoderTests: XCTestCase {
         XCTAssert(output.name == value.name)
         XCTAssert(output.array == value.array)
         XCTAssert(output.intDict == value.intDict)
+        XCTAssert(output.stringSet == value.stringSet)
+        XCTAssert(output.subValue.number == value.subValue.number)
+        XCTAssert(output.subValue.boolean == value.subValue.boolean)
+        XCTAssert(output.subValue.double == value.subValue.double)
+        XCTAssert(output.subValue.name == value.subValue.name)
+        XCTAssert(output.subValue.array == value.subValue.array)
+        XCTAssert(output.subValue.dict == value.subValue.dict)
+    }
+    
+    func testEmptyCollections() throws {
+        let encoder = CloudRecordEncoder()
+        let decoder = CloudRecordDecoder()
+        var value = TestValue()
+        
+        value.array = []
+        value.intDict = [:]
+        value.stringSet = []
+        value.subValue.array = []
+        value.subValue.dict = [:]
+        
+        let record = try encoder.encode(value)
+        
+        let output = try decoder.decode(TestValue.self, from: record)
+        XCTAssert(output.id == value.id)
+        XCTAssert(output.number == value.number)
+        XCTAssert(output.boolean == value.boolean)
+        XCTAssert(output.double == value.double)
+        XCTAssert(output.name == value.name)
+        XCTAssert(output.array == value.array)
+        XCTAssert(output.intDict == value.intDict)
+        XCTAssert(output.stringSet == value.stringSet)
         XCTAssert(output.subValue.number == value.subValue.number)
         XCTAssert(output.subValue.boolean == value.subValue.boolean)
         XCTAssert(output.subValue.double == value.subValue.double)
