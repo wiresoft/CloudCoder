@@ -37,7 +37,7 @@ final class CloudCoderTests: XCTestCase {
         XCTAssert(record.recordID.zoneID == CKRecordZone.ID.default)
         
         // make sure the keys are what we expect
-        XCTAssert(record["id"] == value.id)
+        XCTAssert(record["id"] != nil)
         XCTAssert(record["number"] == value.number)
         XCTAssert(record["boolean"] == value.boolean)
         XCTAssert(record["double"] == value.double)
@@ -104,5 +104,22 @@ final class CloudCoderTests: XCTestCase {
         XCTAssert(output.subValue.name == value.subValue.name)
         XCTAssert(output.subValue.array == value.subValue.array)
         XCTAssert(output.subValue.dict == value.subValue.dict)
+    }
+    
+    func testRoundTripWithMetadata() throws {
+        let encoder = CloudRecordEncoder()
+        let value = TestValue()
+        
+        let record = try encoder.encode(value)
+        let archiver = NSKeyedArchiver(requiringSecureCoding: true)
+        record.encodeSystemFields(with: archiver)
+        archiver.finishEncoding()
+        let metadata = archiver.encodedData
+        
+        let record2 = try encoder.encode(value, metaData: metadata)
+        
+        XCTAssert(record.recordID == record2.recordID)
+        XCTAssert(record.recordType == record2.recordType)
+        XCTAssert(record.recordChangeTag == record2.recordChangeTag)
     }
 }

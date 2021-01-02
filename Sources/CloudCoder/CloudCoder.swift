@@ -35,12 +35,50 @@ public final class CloudRecordEncoder: Encoder {
         )
     }
     
-    public func encode<Value>(_ value: Value, as type: CKRecord.RecordType? = nil) throws -> CKRecord where Value : Encodable, Value : Identifiable, Value.ID : CustomStringConvertible {
+    /// Encode a value as a CKRecord, deriving the RecordType from the swift type name of the value,
+    /// and the record ID from `value.id` converted to a String.
+    /// - Parameters:
+    ///   - value: Value to encode
+    /// - Throws: `DecodingError`
+    /// - Returns: A `CKRecord` of the encoded value
+    public func encode<Value>(_ value: Value) throws -> CKRecord where Value : Encodable, Value : Identifiable, Value.ID : CustomStringConvertible {
         let id = CKRecord.ID(recordName: String(describing: value.id), zoneID: zoneID)
-        let record = CKRecord(recordType: type ?? String(describing: Value.self), recordID: id)
+        let record = CKRecord(recordType: String(describing: Value.self), recordID: id)
         self.record = record
         try value.encode(to: self)
         
+        return record
+    }
+    
+    /// Encode a value as a CKRecord, explicitly specifying the RecordType,
+    /// and deriving the record ID from `value.id` converted to a String.
+    /// - Parameters:
+    ///   - value: Value to encode
+    /// - Throws: `DecodingError`
+    /// - Returns: A `CKRecord` of the encoded value
+    public func encode<Value>(_ value: Value, recordType: CKRecord.RecordType) throws -> CKRecord where Value : Encodable, Value : Identifiable, Value.ID : CustomStringConvertible {
+        let id = CKRecord.ID(recordName: String(describing: value.id), zoneID: zoneID)
+        let record = CKRecord(recordType: recordType, recordID: id)
+        self.record = record
+        try value.encode(to: self)
+        
+        return record
+    }
+    
+    /// Encode a value as a CKRecord, initializing the record from data that has been previously
+    /// encoded with `CKREcord.encodeSystemFieldsWithCoder(with:)`
+    /// - Parameters:
+    ///   - value: value to encode to a CKRecord
+    ///   - metaData: data from `CKREcord.encodeSystemFieldsWithCoder(with:)` encoded with an `NSKeyedArchiver`
+    /// - Throws: `DecodingError`
+    /// - Returns: A `CKRecord` of the encoded value
+    public func encode<Value>(_ value: Value, metaData: Data) throws -> CKRecord where Value : Encodable {
+        let decoder = try NSKeyedUnarchiver(forReadingFrom: metaData)
+        guard let record = CKRecord(coder: decoder) else {
+            throw EncodingError.invalidValue(metaData, EncodingError.Context(codingPath: [], debugDescription: "Could not initialize a CKRecord from the metadata"))
+        }
+        self.record = record
+        try value.encode(to: self)
         return record
     }
     
