@@ -50,6 +50,33 @@ final class CloudCoderTests: XCTestCase {
         XCTAssert(record["subValue_boolean"] == value.subValue.boolean)
         XCTAssert(record["subValue_double"] == value.subValue.double)
         XCTAssert(record["subValue_name"] == value.subValue.name)
+        
+        // make sure we can retrieve the keys from each relevant base path
+        let baseKeys = record.subKeysFromBase("")
+        XCTAssert(baseKeys.count == 9)
+        XCTAssert(baseKeys.contains("id"))
+        XCTAssert(baseKeys.contains("number"))
+        XCTAssert(baseKeys.contains("boolean"))
+        XCTAssert(baseKeys.contains("double"))
+        XCTAssert(baseKeys.contains("name"))
+        XCTAssert(baseKeys.contains("array"))
+        XCTAssert(baseKeys.contains("intDict"))
+        XCTAssert(baseKeys.contains("stringSet"))
+        XCTAssert(baseKeys.contains("subValue"))
+        
+        let subKeys = record.subKeysFromBase("subValue")
+        XCTAssert(subKeys.count == 6)
+        XCTAssert(subKeys.contains("number"))
+        XCTAssert(subKeys.contains("boolean"))
+        XCTAssert(subKeys.contains("double"))
+        XCTAssert(subKeys.contains("name"))
+        XCTAssert(subKeys.contains("array"))
+        XCTAssert(subKeys.contains("dict"))
+        
+        let subDictKeys = record.subKeysFromBase("subValue_dict")
+        XCTAssert(subDictKeys.count == 2)
+        XCTAssert(subDictKeys.contains("one"))
+        XCTAssert(subDictKeys.contains("two"))
     }
     
     func testBasicRoundTrip() throws {

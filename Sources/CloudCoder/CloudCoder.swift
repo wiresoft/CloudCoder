@@ -176,14 +176,23 @@ extension CKRecord {
             guard key.hasPrefix(keyBase) else { return nil }
             
             var partial = key.dropFirst(keyBase.count)
-            if partial.popFirst() == "_" {
+            if partial.first == "_" {
+                _ = partial.popFirst()
                 if let end = partial.firstIndex(of: "_") {
                     return String(partial[..<end])
                 } else {
                     return String(partial)
                 }
             } else {
-                return nil
+                if keyBase.isEmpty {
+                    if let end = partial.firstIndex(of: "_") {
+                        return String(partial[..<end])
+                    } else {
+                        return String(partial)
+                    }
+                } else {
+                    return nil
+                }
             }
         }
         // remove duplicates
